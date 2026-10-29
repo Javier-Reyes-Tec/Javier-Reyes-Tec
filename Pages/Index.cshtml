@@ -1,0 +1,119 @@
+﻿@page
+@model IndexModel
+@{
+	ViewData["Title"] = "Panel de Control";
+}
+
+<div class = "container mt-4">
+	<!-- Encabezado Principal -->
+	<div Class = "d-flex justify-content-between align-items-center mb-4">
+		<h2 Class = "fw-bold text-dark m-0"> 🏋️‍♂️ GYMFIT - Panel de Control </h2>
+		<span Class = "badge bg-secondary p-2fs-6"> 📅 @DateTime.Today.ToString("dd/MM/yyyy")</span>
+	</div>
+    <!-- Barra de Acciones Rápidas -->
+    <div class="row g-3 mb-4 align-items-center">
+        <!-- Formulario de Registro Rápido (Enfoque Senior: Interfaz limpia) -->
+         <div class="row g-3 mb-4 align-items-center">
+            <div class="col-md-4">
+                <!-- Lógica Senior UX: Este botón controla la apertura del formulario colapsable -->
+                <button class="btn btn-success w-100 shadow-sm fw-semibold" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#seccionFormulario" 
+                        aria-expanded="false" 
+                        aria-controls="seccionFormulario">
+                    ➕ Registrar Nuevo Cliente
+                </button>
+            </div>
+            <div class="col-md-8">
+                <input type="text" class="form-control shadow-sm" placeholder="🔍 Buscar cliente por nombre...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario Contenido dentro de un Div Oculto (Collapse) de Bootstrap -->
+    <div class="collapse mb-4" id="seccionFormulario">
+        <div class="card shadow-sm border-0 bg-light">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3 text-secondary">📝 Datos del Nuevo Miembro</h5>
+                <form method="post" class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label small fw-semibold">Nombre Completo</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej. Juan Pérez" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Correo Electrónico</label>
+                        <input type="email" name="correo" class="form-control" placeholder="juan@mail.com" required>
+                    </div>
+                    <!-- Lógica Senior UX: Botones de Acción alineados -->
+                    <div class="col-md-3 d-flex align-items-end justify-content-end gap-2">
+                        <!-- Botón Cancelar: Oculta el formulario usando los mismos atributos de Bootstrap -->
+                        <button type="button" 
+                                class="btn btn-outline-secondary w-50 fw-semibold"
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#seccionFormulario" 
+                                aria-expanded="true" 
+                                aria-controls="seccionFormulario">
+                            ❌ Cancelar
+                        </button>
+
+                        <!-- Botón Guardar -->
+                        <button type="submit" class="btn btn-primary w-50 fw-semibold">
+                            💾 Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Miembros con Estilo Bootstrap -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark text-uppercase fs-7">
+                        <tr>
+                            <th class="ps-3">ID</th>
+                            <th>Nombre Completo</th>
+                            <th>Correo Electrónico</th>
+                            <th>Estado</th>
+                            <th>Vence el</th>
+                            <th class="text-centerpe-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cliente in Model.listaClientes)
+                        {
+                            // Lógica Senior: Cambiar el estilo visual dinámicamente según el estado
+                            string claseBadge = "bg-success";
+                            if (cliente.Estado == GymControl.Web.Models.EstadoMembresia.ProximoAVencer) claseBadge = "bg-warning text-dark";
+                            if (cliente.Estado == GymControl.Web.Models.EstadoMembresia.Vencida) claseBadge = "bg-danger";
+                            <tr>
+                                <td class="ps-3 fw-bold text-muted">@cliente.Id.ToString("D3")</td>
+                                <td class="fw-semibold">@cliente.NombreCompleto</td>
+                                <td>@cliente.Correo</td>
+                                <td>
+                                    <span class="badge @claseBadge px-3 py-2 rounded-pill fs-7">
+                                    @cliente.Estado
+                                    </span>
+                                </td>
+                                <td>@cliente.FechaVencimiento.ToString("dd/MM/yyyy")</td>
+                                    <td class="text-center pe-3">
+                                    <!-- Enfoque Senior: Pequeño formulario en línea para enviar acciones seguras por POST -->
+                                    <form method="post" asp-page-handler="Renovar" asp-route-id="@cliente.Id" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-primary fw-medium me-1">
+                                            💳 Renovar
+                                        </button>
+                                    </form>
+
+                                    <button type="button" class="btn btn-sm btn-outline-secondary fw-medium">✏️ Editar</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
